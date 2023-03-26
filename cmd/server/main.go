@@ -16,6 +16,10 @@ import (
 	"canvas/server"
 )
 
+// release is set through the linker at build time, generally from a git sha.
+// Used for logging and error reporting.
+var release string
+
 func main() {
 	fmt.Println("🤓")
 	os.Exit(start())
@@ -34,11 +38,14 @@ func start() int {
 		_ = log.Sync()
 	}()
 
+	log = log.With(zap.String("release", release))
+
 	host := getStringOrDefault("HOST", "localhost")
 	port := getIntOrDefault("PORT", 8080)
 
 	s := server.New(server.Options{
 		Host: host,
+		Log:  log,
 		Port: port,
 	})
 
